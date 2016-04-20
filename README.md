@@ -9,3 +9,10 @@
 2. App that submits photo, allows for confirmation and manual fix.
 
 3. Where to store photos?
+
+=====================
+
+web server that can run flask app, has permissions to run system commands,
+and has imagemagick and tesseract installed
+
+probably docker on ec2/ecs?
