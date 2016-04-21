@@ -2,7 +2,7 @@ import os
 import subprocess
 import tempfile
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
@@ -13,8 +13,8 @@ def hello_world():
 @app.route('/upload', methods=['POST'])
 def upload():
     photo = request.files['file']
-    number = parse_number(photo)
-    return 'ticket number: %s\n' % number
+    number = parse_number(photo).strip()
+    return jsonify({'ticket number': str(number)})
 
 def parse_number(photo):
     with tempfile.NamedTemporaryFile() as tmp:
@@ -24,7 +24,7 @@ def parse_number(photo):
         os.fsync(tmp.fileno()) 
         with tempfile.NamedTemporaryFile() as converted_file:
             args = ['convert', tmp.name, '-fuzz', '10%', '-fill', 'black',
-                                       '-opaque', '#c5513b', '-threshold', '3%',
+                                       '-opaque', '#C1372C', '-threshold', '3%',
                                        converted_file.name]
             status = subprocess.call(args)
             
@@ -32,7 +32,8 @@ def parse_number(photo):
                 return 'OH NOSE!'
             converted_file.flush()
             os.fsync(converted_file.fileno()) 
-            return subprocess.check_output(['tesseract', converted_file.name, 'stdout', 'digits'])
+            return subprocess.check_output(['tesseract', converted_file.name, 'stdout', 'digits'],
+                                           universal_newlines=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
