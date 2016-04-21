@@ -10,11 +10,21 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello World!\n'
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    photo = request.files['file']
-    number = parse_number(photo).strip()
-    return jsonify({'ticket number': str(number)})
+    if request.method == 'POST':
+        photo = request.files['file']
+        number = parse_number(photo).strip()
+        return jsonify({'ticket number': str(number)})
+    return '''
+    <!doctype html>
+    <title>Get ticket number</title>
+    <h1>Get ticket number</h1>
+    <form action="/upload" method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value="Submit photo">
+    </form>
+    '''
 
 def parse_number(photo):
     with tempfile.NamedTemporaryFile() as tmp:
